@@ -125,3 +125,19 @@ Tunnel fd 5 opened
 [server] socket write: 224 bytes nonce=00000000000000000000001c plain=196
 [server] socket read: enc=212 nonce=000000000000000000000022 -> plain=196 src=10.0.0.2 dst=239.255.255.250
 [server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c400c64000
+[server] socket write: 224 bytes nonce=00000000000000000000001d plain=196
+[server] socket read: enc=212 nonce=000000000000000000000023 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c401a84000
+[server] socket write: 224 bytes nonce=00000000000000000000001e plain=196
+[server] socket read: enc=212 nonce=000000000000000000000024 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c402b34000
+[server] socket write: 224 bytes nonce=00000000000000000000001f plain=196
+[server] socket read: enc=212 nonce=000000000000000000000025 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c403d94000
+[server] socket write: 224 bytes nonce=000000000000000000000020 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000026 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
