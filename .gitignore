@@ -6,4 +6,4 @@ lib64
 liboqs-python
 client.log
 server.log
-pyenv.cfg
+pyvenv.cfg
