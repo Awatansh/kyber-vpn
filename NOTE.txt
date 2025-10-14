@@ -1,0 +1,32 @@
+1. Activate env : source ./bin/activate
+2. run server : python server.py
+3. # enable forwarding
+sudo sysctl -w net.ipv4.ip_forward=1
+sudo sysctl -w net.ipv4.conf.all.rp_filter=0
+sudo sysctl -w net.ipv4.conf.default.rp_filter=0
+sudo sysctl -w net.ipv4.conf.tun0.rp_filter=0
+sudo sysctl -w net.ipv4.conf.tun-client0.rp_filter=0
+
+
+
+# assume server's external interface is eth0; NAT outgoing traffic from tun0
+sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+# configure the server tun interface IP (on server machine)
+sudo ip addr add 10.0.0.1/24 dev tun0
+sudo ip link set tun0 up
+
+
+
+
+#USEFUL COMMANDS
+
+source ./bin/activate 
+
+sudo pkill -f server.py   
+
+ping -I tun-client0 10.0.0.1
+
+sudo bash run_vpn.sh   
+
+sudo bash test_vpn.sh   

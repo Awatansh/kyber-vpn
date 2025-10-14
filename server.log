@@ -1,0 +1,127 @@
+Listening on 0.0.0.0:55555
+Client connected from ('127.0.0.1', 59862)
+Tunnel fd 5 opened
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a7a84000
+[server] socket write: 224 bytes nonce=000000000000000000000001 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000001 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a7b64000
+[server] socket write: 224 bytes nonce=000000000000000000000002 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000002 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a7e14000
+[server] socket write: 224 bytes nonce=000000000000000000000003 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000003 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 68 bytes src=10.0.0.1 dst=224.0.0.251 first8=45000044ad864000
+[server] socket write: 96 bytes nonce=000000000000000000000004 plain=68
+[server] TUN read: 68 bytes src=10.0.0.1 dst=224.0.0.251 first8=45000044ad874000
+[server] socket write: 96 bytes nonce=000000000000000000000005 plain=68
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a84f4000
+[server] socket read: enc=84 nonce=000000000000000000000004 -> plain=68 src=10.0.0.2 dst=224.0.0.251
+[server] TUN write: 68 bytes
+[server] socket write: 224 bytes nonce=000000000000000000000006 plain=196
+[server] socket read: enc=84 nonce=000000000000000000000005 -> plain=68 src=10.0.0.2 dst=224.0.0.251
+[server] TUN write: 68 bytes
+[server] socket read: enc=212 nonce=000000000000000000000006 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 40 bytes src=10.0.0.1 dst=224.0.0.22 first8=46c0002800004000
+[server] socket write: 68 bytes nonce=000000000000000000000007 plain=40
+[server] socket read: enc=56 nonce=000000000000000000000007 -> plain=40 src=10.0.0.2 dst=224.0.0.22
+[server] TUN write: 40 bytes
+[server] socket read: enc=56 nonce=000000000000000000000008 -> plain=40 src=10.0.0.2 dst=224.0.0.22
+[server] TUN write: 40 bytes
+[server] TUN read: 40 bytes src=10.0.0.1 dst=224.0.0.22 first8=46c0002800004000
+[server] socket write: 68 bytes nonce=000000000000000000000008 plain=40
+[server] TUN read: 68 bytes src=10.0.0.1 dst=224.0.0.251 first8=45000044adc94000
+[server] socket write: 96 bytes nonce=000000000000000000000009 plain=68
+[server] TUN read: 68 bytes src=10.0.0.1 dst=224.0.0.251 first8=45000044adca4000
+[server] socket write: 96 bytes nonce=00000000000000000000000a plain=68
+[server] socket read: enc=84 nonce=000000000000000000000009 -> plain=68 src=10.0.0.2 dst=224.0.0.251
+[server] TUN write: 68 bytes
+[server] socket read: enc=84 nonce=00000000000000000000000a -> plain=68 src=10.0.0.2 dst=224.0.0.251
+[server] TUN write: 68 bytes
+[server] TUN read: 68 bytes src=10.0.0.1 dst=224.0.0.251 first8=45000044afb84000
+[server] socket write: 96 bytes nonce=00000000000000000000000b plain=68
+[server] TUN read: 68 bytes src=10.0.0.1 dst=224.0.0.251 first8=45000044afb94000
+[server] socket write: 96 bytes nonce=00000000000000000000000c plain=68
+[server] socket read: enc=84 nonce=00000000000000000000000b -> plain=68 src=10.0.0.2 dst=224.0.0.251
+[server] TUN write: 68 bytes
+[server] socket read: enc=84 nonce=00000000000000000000000c -> plain=68 src=10.0.0.2 dst=224.0.0.251
+[server] TUN write: 68 bytes
+[server] socket read: enc=100 nonce=00000000000000000000000d -> plain=84 src=10.0.0.2 dst=10.0.0.1
+[server] TUN write: 84 bytes
+[server] socket read: enc=100 nonce=00000000000000000000000e -> plain=84 src=10.0.0.2 dst=10.0.0.1
+[server] TUN write: 84 bytes
+[server] socket read: enc=100 nonce=00000000000000000000000f -> plain=84 src=10.0.0.2 dst=10.0.0.1
+[server] TUN write: 84 bytes
+[server] socket read: enc=100 nonce=000000000000000000000010 -> plain=84 src=10.0.0.2 dst=10.0.0.1
+[server] TUN write: 84 bytes
+[server] socket read: enc=100 nonce=000000000000000000000011 -> plain=84 src=10.0.0.2 dst=10.0.0.1
+[server] TUN write: 84 bytes
+[server] socket read: enc=100 nonce=000000000000000000000012 -> plain=84 src=10.0.0.2 dst=10.0.0.1
+[server] TUN write: 84 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4b46f4000
+[server] socket write: 224 bytes nonce=00000000000000000000000d plain=196
+[server] socket read: enc=212 nonce=000000000000000000000013 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4b54a4000
+[server] socket write: 224 bytes nonce=00000000000000000000000e plain=196
+[server] socket read: enc=212 nonce=000000000000000000000014 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4b5994000
+[server] socket write: 224 bytes nonce=00000000000000000000000f plain=196
+[server] socket read: enc=212 nonce=000000000000000000000015 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4b6474000
+[server] socket write: 224 bytes nonce=000000000000000000000010 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000016 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c42e514000
+[server] socket write: 224 bytes nonce=000000000000000000000011 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000017 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c42f434000
+[server] socket write: 224 bytes nonce=000000000000000000000012 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000018 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4305a4000
+[server] socket write: 224 bytes nonce=000000000000000000000013 plain=196
+[server] socket read: enc=212 nonce=000000000000000000000019 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c431074000
+[server] socket write: 224 bytes nonce=000000000000000000000014 plain=196
+[server] socket read: enc=212 nonce=00000000000000000000001a -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c43f314000
+[server] socket write: 224 bytes nonce=000000000000000000000015 plain=196
+[server] socket read: enc=212 nonce=00000000000000000000001b -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c43f6a4000
+[server] socket write: 224 bytes nonce=000000000000000000000016 plain=196
+[server] socket read: enc=212 nonce=00000000000000000000001c -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c43fca4000
+[server] socket write: 224 bytes nonce=000000000000000000000017 plain=196
+[server] socket read: enc=212 nonce=00000000000000000000001d -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c440dd4000
+[server] socket write: 224 bytes nonce=000000000000000000000018 plain=196
+[server] socket read: enc=212 nonce=00000000000000000000001e -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c49f774000
+[server] socket write: 224 bytes nonce=000000000000000000000019 plain=196
+[server] socket read: enc=212 nonce=00000000000000000000001f -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a0514000
+[server] socket write: 224 bytes nonce=00000000000000000000001a plain=196
+[server] socket read: enc=212 nonce=000000000000000000000020 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a0f74000
+[server] socket write: 224 bytes nonce=00000000000000000000001b plain=196
+[server] socket read: enc=212 nonce=000000000000000000000021 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
+[server] TUN read: 196 bytes src=10.0.0.1 dst=239.255.255.250 first8=450000c4a1994000
+[server] socket write: 224 bytes nonce=00000000000000000000001c plain=196
+[server] socket read: enc=212 nonce=000000000000000000000022 -> plain=196 src=10.0.0.2 dst=239.255.255.250
+[server] TUN write: 196 bytes
