@@ -16,7 +16,7 @@ TUN_DEVICE = "/dev/net/tun"
 TUN_IFACE = "tun0"
 LISTEN_HOST = "0.0.0.0"
 LISTEN_PORT = 55555
-PRE_SHARED_KEY = b"16-byte-key-1234"  # 16 bytes for AES-128-GCM
+PRE_SHARED_KEY = b"16-byte-key-1234" 
 
 # TUN setup
 IFF_TUN = 0x0001

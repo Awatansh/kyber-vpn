@@ -11,13 +11,13 @@ import fcntl
 import sys
 import time
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-
+#KEM QKD
 # Configuration
 SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 55555
 TUN_DEVICE = "/dev/net/tun"
 TUN_IFACE = "tun-client0"
-PRE_SHARED_KEY = b"16-byte-key-1234"  # Must match server
+PRE_SHARED_KEY = b"16-byte-key-1234"
 
 # TUN setup
 IFF_TUN = 0x0001
