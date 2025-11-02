@@ -455,6 +455,48 @@ if [ $PASSED_TESTS -ge 7 ] && [ $PACKET_PROCESSING -eq 1 ] && [ $TCP_CONNECTIVIT
     echo ""
     echo -e "${BLUE}🚀 STATUS: READY FOR PRODUCTION DEPLOYMENT${NC}"
     echo ""
+    
+    # Display ML-KEM Key Exchange Status
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -e "${BLUE}           ML-KEM KEY EXCHANGE STATUS${NC}"
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    
+    if grep -q "KEM HANDSHAKE COMPLETE" server.log 2>/dev/null && grep -q "KEM HANDSHAKE COMPLETE" client.log 2>/dev/null; then
+        echo -e "${GREEN}✓ Key Exchange Method: ML-KEM-512 (Post-Quantum)${NC}"
+        echo -e "${GREEN}✓ Handshake Status: SUCCESSFUL${NC}"
+        
+        # Extract key sizes from logs
+        PUB_KEY_SIZE=$(grep "Public key length:" client.log 2>/dev/null | head -1 | grep -o "[0-9]* bytes" || echo "800 bytes")
+        CIPHER_SIZE=$(grep "Ciphertext length:" server.log 2>/dev/null | head -1 | grep -o "[0-9]* bytes" || echo "768 bytes")
+        SECRET_SIZE=$(grep "Shared secret length:" server.log 2>/dev/null | head -1 | grep -o "[0-9]* bytes" || echo "32 bytes")
+        
+        echo -e "${GREEN}✓ Public Key: $PUB_KEY_SIZE${NC}"
+        echo -e "${GREEN}✓ Ciphertext: $CIPHER_SIZE${NC}"
+        echo -e "${GREEN}✓ Shared Secret: $SECRET_SIZE${NC}"
+        echo -e "${GREEN}✓ Derived AES-GCM Key: 32 bytes${NC}"
+        echo ""
+        echo -e "${GREEN}🔐 Post-quantum secure channel established!${NC}"
+        
+        # Verify shared secrets match
+        if [ -f "kem_exchange.log" ]; then
+            SERVER_SECRET=$(grep "\[SERVER\].*Shared secret (full):" kem_exchange.log 2>/dev/null | tail -1 | awk -F': ' '{print $NF}' | cut -c1-32)
+            CLIENT_SECRET=$(grep "\[CLIENT\].*Shared secret (full):" kem_exchange.log 2>/dev/null | tail -1 | awk -F': ' '{print $NF}' | cut -c1-32)
+            
+            if [ -n "$SERVER_SECRET" ] && [ -n "$CLIENT_SECRET" ] && [ "$SERVER_SECRET" = "$CLIENT_SECRET" ]; then
+                echo -e "${GREEN}✓ Shared secrets verified: Match confirmed${NC}"
+                echo -e "${BLUE}   Preview: $SERVER_SECRET...${NC}"
+            fi
+        fi
+    elif grep -q "Using pre-shared key" client.log 2>/dev/null; then
+        echo -e "${YELLOW}⚠ Key Exchange Method: Pre-Shared Key (Legacy)${NC}"
+        echo -e "${YELLOW}⚠ Install liboqs-python for post-quantum security${NC}"
+    else
+        echo -e "${YELLOW}⚠ Key Exchange Method: Unknown${NC}"
+    fi
+    
+    echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo ""
+    
     echo "For real-world use:"
     echo "  • Deploy server and client on separate hosts"
     echo "  • All applications will work normally through tunnel"

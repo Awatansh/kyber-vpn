@@ -7,3 +7,4 @@ liboqs-python
 client.log
 server.log
 pyvenv.cfg
+kem_exchange.log

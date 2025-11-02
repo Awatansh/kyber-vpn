@@ -9,7 +9,24 @@ import threading
 import os
 import fcntl
 import time
+import logging
+from datetime import datetime
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+try:
+    import oqs
+    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+    from cryptography.hazmat.primitives import hashes
+    KEM_ALG = "ML-KEM-512"
+    USE_KEM = True
+except Exception:
+    USE_KEM = False
+
+# Setup logging for key exchange
+kem_logger = logging.getLogger('kem_exchange')
+kem_logger.setLevel(logging.DEBUG)
+kem_handler = logging.FileHandler('kem_exchange.log')
+kem_handler.setFormatter(logging.Formatter('%(asctime)s - [SERVER] - %(levelname)s - %(message)s'))
+kem_logger.addHandler(kem_handler)
 
 # Configuration
 TUN_DEVICE = "/dev/net/tun"
@@ -36,6 +53,87 @@ def tun_create(name="tun0"):
 def handle_client(conn, aead):
     tun = None
     try:
+        # Perform KEM handshake (server side) if available to derive AEAD key
+        if USE_KEM:
+            try:
+                print("\033[1;36m" + "="*70 + "\033[0m")
+                print("\033[1;36m[SERVER] Starting ML-KEM Key Exchange\033[0m")
+                print("\033[1;36m" + "="*70 + "\033[0m")
+                
+                kem_logger.info(f"Starting KEM handshake with algorithm: {KEM_ALG}")
+                kem_logger.info(f"Client connection from: {conn.getpeername()}")
+                
+                # Read client's public key (length-prefixed)
+                print(f"\033[1;33m[SERVER KEM] Waiting for client public key...\033[0m", flush=True)
+                hdr = conn.recv(2)
+                if not hdr:
+                    print("\033[1;31m[SERVER KEM] ERROR: No header from client\033[0m", flush=True)
+                    conn.close()
+                    return
+                plen, = struct.unpack("!H", hdr)
+                print(f"\033[1;32m[SERVER KEM] Received header, expecting {plen} bytes\033[0m", flush=True)
+                
+                pk = b''
+                while len(pk) < plen:
+                    chunk = conn.recv(plen - len(pk))
+                    if not chunk:
+                        break
+                    pk += chunk
+                if len(pk) != plen:
+                    print(f"\033[1;31m[SERVER KEM] ERROR: Incomplete public key (got {len(pk)}/{plen} bytes)\033[0m", flush=True)
+                    conn.close()
+                    return
+                
+                print(f"\033[1;32m[SERVER KEM] ✓ Received client public key ({len(pk)} bytes)\033[0m", flush=True)
+                print(f"\033[1;36m[SERVER KEM] Public key preview: {pk[:32].hex()}...\033[0m", flush=True)
+                
+                kem_logger.info(f"Received client public key: {len(pk)} bytes")
+                kem_logger.debug(f"Public key (full): {pk.hex()}")
+                
+                # Encapsulate to generate shared secret
+                print(f"\033[1;33m[SERVER KEM] Performing encapsulation with {KEM_ALG}...\033[0m", flush=True)
+                with oqs.KeyEncapsulation(KEM_ALG) as server_kem:
+                    ciphertext, shared_secret = server_kem.encap_secret(pk)
+                
+                print(f"\033[1;32m[SERVER KEM] ✓ Encapsulation successful\033[0m", flush=True)
+                print(f"\033[1;36m[SERVER KEM] Ciphertext length: {len(ciphertext)} bytes\033[0m", flush=True)
+                print(f"\033[1;36m[SERVER KEM] Ciphertext preview: {ciphertext[:32].hex()}...\033[0m", flush=True)
+                print(f"\033[1;36m[SERVER KEM] Shared secret length: {len(shared_secret)} bytes\033[0m", flush=True)
+                print(f"\033[1;36m[SERVER KEM] Shared secret preview: {shared_secret[:16].hex()}...\033[0m", flush=True)
+                
+                kem_logger.info(f"Encapsulation completed: ciphertext={len(ciphertext)} bytes, shared_secret={len(shared_secret)} bytes")
+                kem_logger.debug(f"Ciphertext (full): {ciphertext.hex()}")
+                kem_logger.debug(f"Shared secret (full): {shared_secret.hex()}")
+                
+                # Send ciphertext back to client (length-prefixed)
+                print(f"\033[1;33m[SERVER KEM] Sending ciphertext to client...\033[0m", flush=True)
+                conn.sendall(struct.pack("!H", len(ciphertext)) + ciphertext)
+                print(f"\033[1;32m[SERVER KEM] ✓ Ciphertext sent ({len(ciphertext)} bytes)\033[0m", flush=True)
+                
+                # Derive AES key from shared secret
+                print(f"\033[1;33m[SERVER KEM] Deriving AES-GCM key using HKDF-SHA256...\033[0m", flush=True)
+                hkdf = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=b"kyber-vpn")
+                key = hkdf.derive(shared_secret)
+                aead = AESGCM(key)
+                
+                print(f"\033[1;32m[SERVER KEM] ✓ AES-GCM key derived (32 bytes)\033[0m", flush=True)
+                print(f"\033[1;36m[SERVER KEM] Key preview: {key[:16].hex()}...\033[0m", flush=True)
+                print("\033[1;32m" + "="*70 + "\033[0m")
+                print("\033[1;32m[SERVER] ✓✓✓ KEM HANDSHAKE COMPLETE - SECURE CHANNEL ESTABLISHED\033[0m")
+                print("\033[1;32m" + "="*70 + "\033[0m\n", flush=True)
+                
+                kem_logger.info(f"HKDF key derivation completed: AES-GCM key={len(key)} bytes")
+                kem_logger.debug(f"Derived AES-GCM key (full): {key.hex()}")
+                kem_logger.info("KEM handshake SUCCESSFUL - Secure channel established")
+                
+            except Exception as e:
+                print(f"\033[1;31m[SERVER KEM] FATAL ERROR: {e}\033[0m", flush=True)
+                kem_logger.error(f"KEM handshake FAILED: {e}")
+                import traceback
+                kem_logger.error(f"Traceback: {traceback.format_exc()}")
+                traceback.print_exc()
+                conn.close()
+                return
         tun = tun_create(TUN_IFACE)
         print(f"Tunnel fd {tun} opened")
         # Bring interface up + assign IP for server side (idempotent)
@@ -187,6 +285,9 @@ def handle_client(conn, aead):
         print("Connection closed")
 
 def main():
+    # When no per-connection AEAD is provided by handshake, server code
+    # will either get a per-connection aead inside handle_client (from KEM)
+    # or fall back to this pre-shared key for legacy behavior.
     aead = AESGCM(PRE_SHARED_KEY)
     # Create TUN device at startup
     # TUN device creation moved back to handle_client

@@ -10,8 +10,25 @@ import os
 import fcntl
 import sys
 import time
+import logging
+from datetime import datetime
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 #KEM QKD
+try:
+    import oqs
+    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+    from cryptography.hazmat.primitives import hashes
+    KEM_ALG = "ML-KEM-512"
+    USE_KEM = True
+except Exception:
+    USE_KEM = False
+
+# Setup logging for key exchange
+kem_logger = logging.getLogger('kem_exchange')
+kem_logger.setLevel(logging.DEBUG)
+kem_handler = logging.FileHandler('kem_exchange.log', mode='a')
+kem_handler.setFormatter(logging.Formatter('%(asctime)s - [CLIENT] - %(levelname)s - %(message)s'))
+kem_logger.addHandler(kem_handler)
 # Configuration
 SERVER_HOST = "127.0.0.1"
 SERVER_PORT = 55555
@@ -40,9 +57,100 @@ def main():
     stop = threading.Event()
     try:
         print("[client] starting", flush=True)
-        aead = AESGCM(PRE_SHARED_KEY)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((SERVER_HOST, SERVER_PORT))
+        
+        # Perform KEM handshake (client side) if available to derive AEAD key
+        if USE_KEM:
+            try:
+                print("\033[1;35m" + "="*70 + "\033[0m", flush=True)
+                print("\033[1;35m[CLIENT] Starting ML-KEM Key Exchange\033[0m", flush=True)
+                print("\033[1;35m" + "="*70 + "\033[0m", flush=True)
+                
+                kem_logger.info(f"Starting KEM handshake with algorithm: {KEM_ALG}")
+                kem_logger.info(f"Connecting to server: {SERVER_HOST}:{SERVER_PORT}")
+                
+                print(f"\033[1;33m[CLIENT KEM] Initializing {KEM_ALG} key encapsulation...\033[0m", flush=True)
+                with oqs.KeyEncapsulation(KEM_ALG) as client_kem:
+                    print(f"\033[1;33m[CLIENT KEM] Generating keypair...\033[0m", flush=True)
+                    pub = client_kem.generate_keypair()
+                    
+                    print(f"\033[1;32m[CLIENT KEM] ✓ Keypair generated\033[0m", flush=True)
+                    print(f"\033[1;36m[CLIENT KEM] Public key length: {len(pub)} bytes\033[0m", flush=True)
+                    print(f"\033[1;36m[CLIENT KEM] Public key preview: {pub[:32].hex()}...\033[0m", flush=True)
+                    
+                    kem_logger.info(f"Keypair generated: public_key={len(pub)} bytes")
+                    kem_logger.debug(f"Public key (full): {pub.hex()}")
+                    
+                    # Send client's public key (length-prefixed)
+                    print(f"\033[1;33m[CLIENT KEM] Sending public key to server...\033[0m", flush=True)
+                    s.sendall(struct.pack("!H", len(pub)) + pub)
+                    print(f"\033[1;32m[CLIENT KEM] ✓ Public key sent ({len(pub)} bytes)\033[0m", flush=True)
+                    
+                    # Receive ciphertext from server
+                    print(f"\033[1;33m[CLIENT KEM] Waiting for ciphertext from server...\033[0m", flush=True)
+                    hdr = s.recv(2)
+                    if not hdr:
+                        print("\033[1;31m[CLIENT KEM] ERROR: No header from server\033[0m", flush=True)
+                        return
+                    ctlen, = struct.unpack("!H", hdr)
+                    print(f"\033[1;32m[CLIENT KEM] Received header, expecting {ctlen} bytes\033[0m", flush=True)
+                    
+                    ct = b''
+                    while len(ct) < ctlen:
+                        chunk = s.recv(ctlen - len(ct))
+                        if not chunk:
+                            break
+                        ct += chunk
+                    if len(ct) != ctlen:
+                        print(f"\033[1;31m[CLIENT KEM] ERROR: Incomplete ciphertext (got {len(ct)}/{ctlen} bytes)\033[0m", flush=True)
+                        return
+                    
+                    print(f"\033[1;32m[CLIENT KEM] ✓ Received ciphertext ({len(ct)} bytes)\033[0m", flush=True)
+                    print(f"\033[1;36m[CLIENT KEM] Ciphertext preview: {ct[:32].hex()}...\033[0m", flush=True)
+                    
+                    kem_logger.info(f"Received ciphertext from server: {len(ct)} bytes")
+                    kem_logger.debug(f"Ciphertext (full): {ct.hex()}")
+                    
+                    # Decapsulate to recover shared secret
+                    print(f"\033[1;33m[CLIENT KEM] Performing decapsulation...\033[0m", flush=True)
+                    shared_secret = client_kem.decap_secret(ct)
+                    
+                    print(f"\033[1;32m[CLIENT KEM] ✓ Decapsulation successful\033[0m", flush=True)
+                    print(f"\033[1;36m[CLIENT KEM] Shared secret length: {len(shared_secret)} bytes\033[0m", flush=True)
+                    print(f"\033[1;36m[CLIENT KEM] Shared secret preview: {shared_secret[:16].hex()}...\033[0m", flush=True)
+                    
+                    kem_logger.info(f"Decapsulation completed: shared_secret={len(shared_secret)} bytes")
+                    kem_logger.debug(f"Shared secret (full): {shared_secret.hex()}")
+                
+                # Derive AES key from shared secret
+                print(f"\033[1;33m[CLIENT KEM] Deriving AES-GCM key using HKDF-SHA256...\033[0m", flush=True)
+                hkdf = HKDF(algorithm=hashes.SHA256(), length=32, salt=None, info=b"kyber-vpn")
+                key = hkdf.derive(shared_secret)
+                aead = AESGCM(key)
+                
+                print(f"\033[1;32m[CLIENT KEM] ✓ AES-GCM key derived (32 bytes)\033[0m", flush=True)
+                print(f"\033[1;36m[CLIENT KEM] Key preview: {key[:16].hex()}...\033[0m", flush=True)
+                print("\033[1;32m" + "="*70 + "\033[0m", flush=True)
+                print("\033[1;32m[CLIENT] ✓✓✓ KEM HANDSHAKE COMPLETE - SECURE CHANNEL ESTABLISHED\033[0m", flush=True)
+                print("\033[1;32m" + "="*70 + "\033[0m\n", flush=True)
+                
+                kem_logger.info(f"HKDF key derivation completed: AES-GCM key={len(key)} bytes")
+                kem_logger.debug(f"Derived AES-GCM key (full): {key.hex()}")
+                kem_logger.info("KEM handshake SUCCESSFUL - Secure channel established")
+                
+            except Exception as e:
+                print(f"\033[1;31m[CLIENT KEM] FATAL ERROR: {e}\033[0m", flush=True)
+                kem_logger.error(f"KEM handshake FAILED: {e}")
+                import traceback
+                kem_logger.error(f"Traceback: {traceback.format_exc()}")
+                traceback.print_exc()
+                return
+        else:
+            aead = AESGCM(PRE_SHARED_KEY)
+            print("\033[1;33m[CLIENT] Using pre-shared key (KEM not available)\033[0m", flush=True)
+        
+        print("[client] connected to server", flush=True)
         print("[client] connected to server", flush=True)
         tun = tun_create(TUN_IFACE)
         print("Tunnel opened", flush=True)

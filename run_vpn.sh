@@ -35,6 +35,34 @@ sudo -E ./bin/python3 client.py > client.log 2>&1 &
 CLIENT_PID=$!
 sleep 5
 
+# Check for KEM handshake success
+echo ""
+echo "Checking ML-KEM Key Exchange status..."
+if grep -q "KEM HANDSHAKE COMPLETE" server.log 2>/dev/null && grep -q "KEM HANDSHAKE COMPLETE" client.log 2>/dev/null; then
+    echo -e "\033[1;32m✓✓✓ ML-KEM KEY EXCHANGE SUCCESSFUL!\033[0m"
+    echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    
+    # Extract and display key exchange details
+    echo -e "\033[1;33mServer Side:\033[0m"
+    grep "PUBLIC KEY\|CIPHERTEXT\|SHARED SECRET\|AES-GCM KEY\|✓" server.log | head -10 | sed 's/\x1b\[[0-9;]*m//g' | grep -E "(Received|sent|derived|Encapsulation)" | sed 's/^/  /'
+    
+    echo ""
+    echo -e "\033[1;35mClient Side:\033[0m"
+    grep "PUBLIC KEY\|CIPHERTEXT\|SHARED SECRET\|AES-GCM KEY\|✓" client.log | head -10 | sed 's/\x1b\[[0-9;]*m//g' | grep -E "(Keypair|sent|Received|derived|Decapsulation)" | sed 's/^/  /'
+    
+    echo -e "\033[1;36m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    echo -e "\033[1;32m✓ Secure channel established using ML-KEM-512\033[0m"
+    echo -e "\033[1;32m✓ All traffic will be encrypted with derived AES-GCM key\033[0m"
+    echo ""
+elif grep -q "Using pre-shared key" client.log 2>/dev/null; then
+    echo -e "\033[1;33m⚠ Using pre-shared key (ML-KEM not available)\033[0m"
+    echo -e "\033[1;33m  Install liboqs-python for post-quantum key exchange\033[0m"
+    echo ""
+else
+    echo -e "\033[1;31m⚠ Key exchange status unknown - check logs\033[0m"
+    echo ""
+fi
+
 # Immediate debug output for tun-client0 after client start (may or may not exist yet)
 echo "State of tun-client0 immediately after starting client.py:"
 ip link show tun-client0 || echo "tun-client0 not present yet"
